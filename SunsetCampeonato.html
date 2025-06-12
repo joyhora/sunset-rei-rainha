@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Placar do Campeonato de Vôlei</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .tab-btn.active { 
+            border-color: #4f46e5; 
+            background-color: #eef2ff;
+            color: #4f46e5;
+            font-weight: 600;
+        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        input[type="number"]::-webkit-inner-spin-button, 
+        input[type="number"]::-webkit-outer-spin-button { 
+          -webkit-appearance: none; 
+          margin: 0; 
+        }
+        input[type="number"] { -moz-appearance: textfield; }
+        .table-container {
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+    <div id="app" class="container mx-auto p-4 md:p-8">
+        <header class="text-center mb-6 md:mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-indigo-600">Placar do Campeonato de Vôlei</h1>
+            <p class="text-slate-500 mt-2">Resultados atualizados em tempo real.</p>
+        </header>
+        
+        <div id="mode-indicator" class="mb-4"></div>
+        <div id="auth-info" class="mb-4 text-center text-sm text-gray-500" style="display: none;">
+            <p>Carregando...</p>
+        </div>
+
+        <div class="border-b border-gray-200 mb-6">
+            <nav class="flex flex-wrap -mb-px" id="tabs">
+                <button data-tab="games" class="tab-btn text-center p-4 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 transition duration-150 ease-in-out">Grade de Jogos</button>
+                <button data-tab="rei" class="tab-btn text-center p-4 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 transition duration-150 ease-in-out">Rei da Quadra</button>
+                <button data-tab="rainha" class="tab-btn text-center p-4 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 transition duration-150 ease-in-out">Rainha da Quadra</button>
+                <button data-tab="geral" class="tab-btn text-center p-4 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 transition duration-150 ease-in-out">Ranking Geral</button>
+            </nav>
+        </div>
+
+        <main>
+            <!-- Conteúdo da Grade de Jogos -->
+            <div id="games-content" class="tab-content">
+                <div class="table-container bg-white p-4 rounded-lg shadow-sm">
+                    <table class="w-full text-sm text-left text-gray-600">
+                        <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-4 py-3 hidden md:table-cell">Rodada</th>
+                                <th scope="col" class="px-4 py-3 hidden md:table-cell">Horário</th>
+                                <th scope="col" class="px-4 py-3">Dupla 1</th>
+                                <th scope="col" class="px-2 py-3 text-center">Pontos</th>
+                                <th scope="col" class="px-2 py-3 text-center">X</th>
+                                <th scope="col" class="px-2 py-3 text-center">Pontos</th>
+                                <th scope="col" class="px-4 py-3">Dupla 2</th>
+                            </tr>
+                        </thead>
+                        <tbody id="games-table-body">
+                           <!-- Linhas dos jogos serão inseridas aqui -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Conteúdo do Rei -->
+            <div id="rei-content" class="tab-content">
+                <div class="table-container bg-white p-4 rounded-lg shadow-sm">
+                    <table class="w-full text-sm text-left text-gray-600">
+                        <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-6 py-3">Posição</th>
+                                <th scope="col" class="px-6 py-3">Nome do Jogador</th>
+                                <th scope="col" class="px-6 py-3 text-center">Vitórias</th>
+                                <th scope="col" class="px-6 py-3 text-center">Derrotas</th>
+                                <th scope="col" class="px-6 py-3 text-center">Soma de Pontos</th>
+                            </tr>
+                        </thead>
+                        <tbody id="rei-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Conteúdo da Rainha -->
+            <div id="rainha-content" class="tab-content">
+                 <div class="table-container bg-white p-4 rounded-lg shadow-sm">
+                    <table class="w-full text-sm text-left text-gray-600">
+                        <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                           <tr>
+                                <th scope="col" class="px-6 py-3">Posição</th>
+                                <th scope="col" class="px-6 py-3">Nome da Jogadora</th>
+                                <th scope="col" class="px-6 py-3 text-center">Vitórias</th>
+                                <th scope="col" class="px-6 py-3 text-center">Derrotas</th>
+                                <th scope="col" class="px-6 py-3 text-center">Soma de Pontos</th>
+                            </tr>
+                        </thead>
+                        <tbody id="rainha-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Conteúdo Geral -->
+            <div id="geral-content" class="tab-content">
+                 <div class="table-container bg-white p-4 rounded-lg shadow-sm">
+                    <table class="w-full text-sm text-left text-gray-600">
+                        <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-6 py-3">Posição</th>
+                                <th scope="col" class="px-6 py-3">Nome do Jogador(a)</th>
+                                <th scope="col" class="px-6 py-3 text-center">Vitórias</th>
+                                <th scope="col" class="px-6 py-3 text-center">Derrotas</th>
+                                <th scope="col" class="px-6 py-3 text-center">Soma de Pontos</th>
+                            </tr>
+                        </thead>
+                        <tbody id="geral-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : { apiKey: "YOUR_API_KEY", authDomain: "YOUR_AUTH_DOMAIN", projectId: "YOUR_PROJECT_ID" };
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'volei-app-default';
+        
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        const initialGames = [
+            { id: 1, round: 1, horario: '08:30', p1h: 'Johnny', p1m: 'Thais', p2h: 'Eduardo', p2m: 'Jamile' },
+            { id: 2, round: 1, horario: '08:30', p1h: 'Alexandre', p1m: 'Isabela', p2h: 'Kelvin', p2m: 'Madalena' },
+            { id: 3, round: 1, horario: '08:30', p1h: 'Pablo', p1m: 'Mayara', p2h: 'Renan', p2m: 'A confirmar' },
+            { id: 4, round: 1, horario: '08:30', p1h: 'Kelvin', p1m: 'Madalena', p2h: 'A confirmar', p2m: 'Ana Clara' },
+            { id: 5, round: 2, horario: '08:50', p1h: 'Pablo', p1m: 'Cris', p2h: 'A confirmar', p2m: 'Roberta' },
+            { id: 6, round: 2, horario: '08:50', p1h: 'A confirmar', p1m: 'A confirmar', p2h: 'Eduardo', p2m: 'Joyce' },
+            { id: 7, round: 2, horario: '08:50', p1h: 'Pablo', p1m: 'Thais', p2h: 'João', p2m: 'Mayara' },
+            { id: 8, round: 2, horario: '08:50', p1h: 'A confirmar', p1m: 'Ana Clara', p2h: 'Renan', p2m: 'Isabela' },
+            { id: 9, round: 3, horario: '09:10', p1h: 'Johnny', p1m: 'Mayara', p2h: 'Eduardo', p2m: 'Thais' },
+            { id: 10, round: 3, horario: '09:10', p1h: 'Pablo', p1m: 'A confirmar', p2h: 'A confirmar', p2m: 'Jamile' },
+            { id: 11, round: 3, horario: '09:10', p1h: 'Alexandre', p1m: 'Joyce', p2h: 'Renan', p2m: 'Cris' },
+            { id: 12, round: 3, horario: '09:10', p1h: 'Johnny', p1m: 'Joyce', p2h: 'Eduardo', p2m: 'Cris' },
+            { id: 13, round: 4, horario: '09:30', p1h: 'Alexandre', p1m: 'Thais', p2h: 'Renan', p2m: 'Mayara' },
+            { id: 14, round: 4, horario: '09:30', p1h: 'Pablo', p1m: 'Isabela', p2h: 'A confirmar', p2m: 'A confirmar' },
+            { id: 15, round: 4, horario: '09:30', p1h: 'Kelvin', p1m: 'Jamile', p2h: 'A confirmar', p2m: 'Roberta' },
+            { id: 16, round: 4, horario: '09:30', p1h: 'A confirmar', p1m: 'Joyce', p2h: 'A confirmar', p2m: 'Cris' },
+            { id: 17, round: 5, horario: '09:50', p1h: 'Johnny', p1m: 'Mayara', p2h: 'Eduardo', p2m: 'Thais' },
+            { id: 18, round: 5, horario: '09:50', p1h: 'Pablo', p1m: 'Ana Clara', p2h: 'João', p2m: 'Madalena' },
+            { id: 19, round: 5, horario: '09:50', p1h: 'Kelvin', p1m: 'Mayara', p2h: 'A confirmar', p2m: 'Thais' },
+            { id: 20, round: 5, horario: '09:50', p1h: 'Alexandre', p1m: 'Jamile', p2h: 'Renan', p2m: 'Roberta' },
+        ];
+
+        let userId = null;
+        let scores = {};
+        let scoresRef = null;
+        
+        // **NOVO: Determina o modo (edição ou visualização) pela URL**
+        const urlParams = new URLSearchParams(window.location.search);
+        const mode = urlParams.get('mode') === 'edit' ? 'edit' : 'view'; // Padrão para 'view'
+
+        function showModeIndicator() {
+            const modeIndicator = document.getElementById('mode-indicator');
+            if (mode === 'edit') {
+                modeIndicator.innerHTML = `
+                    <div class="p-2 bg-green-100 text-green-800 rounded-md text-sm text-center">
+                        <span class="font-bold">Modo Edição:</span> Você pode alterar os placares.
+                    </div>
+                `;
+                document.getElementById('auth-info').style.display = 'block';
+            } else {
+                modeIndicator.innerHTML = `
+                    <div class="p-2 bg-sky-100 text-sky-800 rounded-md text-sm text-center">
+                        <span class="font-bold">Modo Visualização:</span> Para alterar, peça o link de edição ao organizador.
+                    </div>
+                `;
+                document.getElementById('auth-info').style.display = 'none';
+            }
+        }
+        
+        async function setupAuth() {
+            onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    userId = user.uid;
+                    scoresRef = doc(db, "artifacts", appId, "public", "data", "scores", "allScores");
+                    
+                    if(mode === 'edit') {
+                        document.getElementById('auth-info').innerHTML = `<p>Conectado como: <span class="font-mono text-xs">${userId}</span></p>`;
+                    }
+                    initializeData();
+                }
+            });
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (error) {
+                console.error("Authentication failed:", error);
+                document.getElementById('auth-info').innerHTML = `<p class="text-red-500">Falha na autenticação.</p>`;
+            }
+        }
+        
+        async function initializeData() {
+            if (!scoresRef) return;
+            onSnapshot(scoresRef, (docSnap) => {
+                scores = docSnap.exists() ? docSnap.data() : {};
+                renderGamesTable();
+                updateAllRankings();
+            });
+        }
+
+        function renderGamesTable() {
+            const tableBody = document.getElementById('games-table-body');
+            tableBody.innerHTML = '';
+            initialGames.forEach(game => {
+                const score1 = scores[game.id]?.score1 ?? null;
+                const score2 = scores[game.id]?.score2 ?? null;
+
+                const row = document.createElement('tr');
+                row.className = 'bg-white border-b hover:bg-gray-50';
+
+                // **NOVO: Renderiza input ou texto baseado no modo**
+                const scoreInput1 = mode === 'edit' 
+                    ? `<input type="number" data-game-id="${game.id}" data-team="1" class="w-16 text-center bg-gray-100 rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" value="${score1 ?? ''}">`
+                    : `<span class="font-semibold text-lg text-slate-700">${score1 ?? '-'}</span>`;
+
+                const scoreInput2 = mode === 'edit'
+                    ? `<input type="number" data-game-id="${game.id}" data-team="2" class="w-16 text-center bg-gray-100 rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" value="${score2 ?? ''}">`
+                    : `<span class="font-semibold text-lg text-slate-700">${score2 ?? '-'}</span>`;
+
+                row.innerHTML = `
+                    <td class="px-4 py-3 hidden md:table-cell font-medium text-gray-900">${game.round}</td>
+                    <td class="px-4 py-3 hidden md:table-cell text-gray-700">${game.horario}</td>
+                    <td class="px-4 py-3">
+                        <div class="font-semibold text-slate-800">${game.p1h}</div>
+                        <div class="font-semibold text-slate-600">${game.p1m}</div>
+                    </td>
+                    <td class="px-2 py-3 text-center">${scoreInput1}</td>
+                    <td class="px-2 py-3 text-center text-gray-400">x</td>
+                    <td class="px-2 py-3 text-center">${scoreInput2}</td>
+                    <td class="px-4 py-3">
+                        <div class="font-semibold text-slate-800">${game.p2h}</div>
+                        <div class="font-semibold text-slate-600">${game.p2m}</div>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+
+            // **NOVO: Adiciona listeners apenas no modo de edição**
+            if (mode === 'edit') {
+                document.querySelectorAll('#games-table-body input').forEach(input => {
+                    input.addEventListener('input', handleScoreChange);
+                });
+            }
+        }
+        
+        async function handleScoreChange(event) {
+            if (!userId || !scoresRef || mode !== 'edit') return;
+            const input = event.target;
+            const gameId = input.dataset.gameId;
+            const team = input.dataset.team;
+            const value = input.value === '' ? null : parseInt(input.value, 10);
+
+            await setDoc(scoresRef, { [gameId]: { ...scores[gameId], [team === '1' ? 'score1' : 'score2']: value } }, { merge: true });
+        }
+
+        function updateAllRankings() {
+            const playersStats = {};
+
+            initialGames.forEach(game => {
+                const gameScores = scores[game.id];
+                if (gameScores && typeof gameScores.score1 === 'number' && typeof gameScores.score2 === 'number') {
+                    const s1 = gameScores.score1;
+                    const s2 = gameScores.score2;
+                    const team1Won = s1 > s2;
+                    const team2Won = s2 > s1;
+
+                    [game.p1h, game.p1m].forEach(p => {
+                        if (p && p !== 'A confirmar') {
+                            if (!playersStats[p]) playersStats[p] = { name: p, wins: 0, losses: 0, points: 0, gender: '' };
+                            playersStats[p].wins += team1Won ? 1 : 0;
+                            playersStats[p].losses += team2Won ? 1 : 0;
+                            playersStats[p].points += s1;
+                        }
+                    });
+
+                    [game.p2h, game.p2m].forEach(p => {
+                         if (p && p !== 'A confirmar') {
+                            if (!playersStats[p]) playersStats[p] = { name: p, wins: 0, losses: 0, points: 0, gender: '' };
+                            playersStats[p].wins += team2Won ? 1 : 0;
+                            playersStats[p].losses += team1Won ? 1 : 0;
+                            playersStats[p].points += s2;
+                        }
+                    });
+                }
+            });
+            
+            const malePlayers = new Set(initialGames.flatMap(g => [g.p1h, g.p2h]));
+            const femalePlayers = new Set(initialGames.flatMap(g => [g.p1m, g.p2m]));
+
+            Object.values(playersStats).forEach(p => {
+                if (malePlayers.has(p.name)) p.gender = 'male';
+                if (femalePlayers.has(p.name)) p.gender = 'female';
+            });
+            
+            const allPlayersArray = Object.values(playersStats);
+            const malePlayersArray = allPlayersArray.filter(p => p.gender === 'male');
+            const femalePlayersArray = allPlayersArray.filter(p => p.gender === 'female');
+
+            const sortFn = (a, b) => b.wins - a.wins || b.points - a.points;
+
+            renderRankingTable('rei-table-body', malePlayersArray.sort(sortFn));
+            renderRankingTable('rainha-table-body', femalePlayersArray.sort(sortFn));
+            renderRankingTable('geral-table-body', allPlayersArray.sort(sortFn));
+        }
+
+        function renderRankingTable(tableBodyId, players) {
+            const tableBody = document.getElementById(tableBodyId);
+            tableBody.innerHTML = '';
+            if (players.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="5" class="text-center py-8 text-gray-500">Aguardando resultados...</td></tr>`;
+                return;
+            }
+
+            players.forEach((player, index) => {
+                const row = document.createElement('tr');
+                row.className = 'bg-white border-b hover:bg-gray-50';
+                row.innerHTML = `
+                    <td class="px-6 py-4 font-bold text-lg text-indigo-600">${index + 1}</td>
+                    <td class="px-6 py-4 font-medium text-gray-900">${player.name}</td>
+                    <td class="px-6 py-4 text-center text-green-600 font-semibold">${player.wins}</td>
+                    <td class="px-6 py-4 text-center text-red-600 font-semibold">${player.losses}</td>
+                    <td class="px-6 py-4 text-center font-semibold">${player.points}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        const tabs = document.getElementById('tabs');
+        const contents = document.querySelectorAll('.tab-content');
+        tabs.addEventListener('click', (e) => {
+            if (e.target.tagName === 'BUTTON') {
+                const targetTab = e.target.dataset.tab;
+                tabs.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
+                e.target.classList.add('active');
+                contents.forEach(content => {
+                    content.classList.remove('active');
+                    if (content.id === `${targetTab}-content`) {
+                        content.classList.add('active');
+                    }
+                });
+            }
+        });
+
+        window.onload = () => {
+            document.querySelector('.tab-btn[data-tab="games"]').click();
+            showModeIndicator();
+            setupAuth();
+        };
+    </script>
+</body>
+</html>
