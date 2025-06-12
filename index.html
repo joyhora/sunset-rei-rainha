@@ -32,6 +32,7 @@
 
     <div id="app" class="container mx-auto p-4 md:p-8">
         <header class="text-center mb-6 md:mb-8">
+            <!-- A imagem será carregada a partir do seu repositório -->
             <img src="logo.png" alt="Logo do Campeonato" class="mx-auto h-24 w-auto mb-4" onerror="this.style.display='none'">
             
             <h1 class="text-3xl md:text-4xl font-bold text-indigo-600">Placar do Campeonato de Vôlei</h1>
@@ -162,7 +163,7 @@
         let userId = null;
         let scores = {};
         let scoresRef = null;
-        let accessMode = 'view'; // Padrão é visualização
+        let accessMode = 'view'; 
 
         function showModeIndicator() {
             const modeIndicator = document.getElementById('mode-indicator');
@@ -187,11 +188,10 @@
             onAuthStateChanged(auth, async (user) => {
                 if (user) {
                     userId = user.uid;
-                    // O caminho correto para dados públicos compartilhados
                     scoresRef = doc(db, "artifacts", appId, "public", "data", "scores", "allScores");
                     
                     if(accessMode === 'edit') {
-                        document.getElementById('auth-info').innerHTML = `<p>Conectado como: Organizador <span class="font-mono text-xs"/span></p>`;
+                        document.getElementById('auth-info').innerHTML = `<p>Conectado como: <span class="font-mono text-xs">${userId}</span></p>`;
                     }
                     initializeData();
                 }
@@ -219,18 +219,14 @@
             initialGames.forEach(game => {
                 const score1 = scores[game.id]?.score1 ?? null;
                 const score2 = scores[game.id]?.score2 ?? null;
-
                 const row = document.createElement('tr');
                 row.className = 'bg-white border-b hover:bg-gray-50';
-
                 const scoreInput1 = accessMode === 'edit' 
                     ? `<input type="number" data-game-id="${game.id}" data-team="1" class="w-16 text-center bg-gray-100 rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" value="${score1 ?? ''}">`
                     : `<span class="font-semibold text-lg text-slate-700">${score1 ?? '-'}</span>`;
-
                 const scoreInput2 = accessMode === 'edit'
                     ? `<input type="number" data-game-id="${game.id}" data-team="2" class="w-16 text-center bg-gray-100 rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" value="${score2 ?? ''}">`
                     : `<span class="font-semibold text-lg text-slate-700">${score2 ?? '-'}</span>`;
-
                 row.innerHTML = `
                     <td class="px-4 py-3 hidden md:table-cell font-medium text-gray-900">${game.round}</td>
                     <td class="px-4 py-3 hidden md:table-cell text-gray-700">${game.horario}</td>
@@ -244,14 +240,13 @@
                     <td class="px-4 py-3">
                         <div class="font-semibold text-slate-800">${game.p2h}</div>
                         <div class="font-semibold text-slate-600">${game.p2m}</div>
-                    </td>
-                `;
+                    </td>`;
                 tableBody.appendChild(row);
             });
-
             if (accessMode === 'edit') {
                 document.querySelectorAll('#games-table-body input').forEach(input => {
-                    input.addEventListener('input', handleScoreChange);
+                    // *** CORREÇÃO APLICADA AQUI ***
+                    input.addEventListener('change', handleScoreChange);
                 });
             }
         }
@@ -262,7 +257,6 @@
             const gameId = input.dataset.gameId;
             const team = input.dataset.team;
             const value = input.value === '' ? null : parseInt(input.value, 10);
-
             await setDoc(scoresRef, { [gameId]: { ...scores[gameId], [team === '1' ? 'score1' : 'score2']: value } }, { merge: true });
         }
 
@@ -273,12 +267,12 @@
                 if (gameScores && typeof gameScores.score1 === 'number' && typeof gameScores.score2 === 'number') {
                     const s1 = gameScores.score1, s2 = gameScores.score2;
                     const team1Won = s1 > s2, team2Won = s2 > s1;
-                    [game.p1h, game.p1m].forEach(p => { if (p && p !== 'A confirmar') { if (!playersStats[p]) playersStats[p] = { name: p, wins: 0, losses: 0, points: 0, gender: '' }; playersStats[p].wins += team1Won ? 1 : 0; playersStats[p].losses += team2Won ? 1 : 0; playersStats[p].points += s1; } });
-                    [game.p2h, game.p2m].forEach(p => { if (p && p !== 'A confirmar') { if (!playersStats[p]) playersStats[p] = { name: p, wins: 0, losses: 0, points: 0, gender: '' }; playersStats[p].wins += team2Won ? 1 : 0; playersStats[p].losses += team1Won ? 1 : 0; playersStats[p].points += s2; } });
+                    [game.p1h, game.p1m].forEach(p => { if (p && p.indexOf('A confirmar') === -1) { if (!playersStats[p]) playersStats[p] = { name: p, wins: 0, losses: 0, points: 0, gender: '' }; playersStats[p].wins += team1Won ? 1 : 0; playersStats[p].losses += team2Won ? 1 : 0; playersStats[p].points += s1; } });
+                    [game.p2h, game.p2m].forEach(p => { if (p && p.indexOf('A confirmar') === -1) { if (!playersStats[p]) playersStats[p] = { name: p, wins: 0, losses: 0, points: 0, gender: '' }; playersStats[p].wins += team2Won ? 1 : 0; playersStats[p].losses += team1Won ? 1 : 0; playersStats[p].points += s2; } });
                 }
             });
-            const malePlayers = new Set(initialGames.flatMap(g => [g.p1h, g.p2h]));
-            const femalePlayers = new Set(initialGames.flatMap(g => [g.p1m, g.p2m]));
+            const malePlayers = new Set(initialGames.flatMap(g => [g.p1h, g.p2h]).filter(p => p.indexOf('A confirmar') === -1));
+            const femalePlayers = new Set(initialGames.flatMap(g => [g.p1m, g.p2m]).filter(p => p.indexOf('A confirmar') === -1));
             Object.values(playersStats).forEach(p => { if (malePlayers.has(p.name)) p.gender = 'male'; if (femalePlayers.has(p.name)) p.gender = 'female'; });
             const allPlayersArray = Object.values(playersStats), malePlayersArray = allPlayersArray.filter(p => p.gender === 'male'), femalePlayersArray = allPlayersArray.filter(p => p.gender === 'female');
             const sortFn = (a, b) => b.wins - a.wins || b.points - a.points;
