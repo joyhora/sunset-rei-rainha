@@ -32,6 +32,8 @@
 
     <div id="app" class="container mx-auto p-4 md:p-8">
         <header class="text-center mb-6 md:mb-8">
+            <img src="logo.png" alt="Logo do Campeonato" class="mx-auto h-24 w-auto mb-4" onerror="this.style.display='none'">
+            
             <h1 class="text-3xl md:text-4xl font-bold text-indigo-600">Placar do Campeonato de Vôlei</h1>
             <p class="text-slate-500 mt-2">Resultados atualizados em tempo real.</p>
         </header>
@@ -73,77 +75,31 @@
                 </div>
             </div>
 
-            <!-- Conteúdo do Rei -->
-            <div id="rei-content" class="tab-content">
-                <div class="table-container bg-white p-4 rounded-lg shadow-sm">
-                    <table class="w-full text-sm text-left text-gray-600">
-                        <thead class="text-xs text-gray-700 uppercase bg-gray-50">
-                            <tr>
-                                <th scope="col" class="px-6 py-3">Posição</th>
-                                <th scope="col" class="px-6 py-3">Nome do Jogador</th>
-                                <th scope="col" class="px-6 py-3 text-center">Vitórias</th>
-                                <th scope="col" class="px-6 py-3 text-center">Derrotas</th>
-                                <th scope="col" class="px-6 py-3 text-center">Soma de Pontos</th>
-                            </tr>
-                        </thead>
-                        <tbody id="rei-table-body"></tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Conteúdo da Rainha -->
-            <div id="rainha-content" class="tab-content">
-                 <div class="table-container bg-white p-4 rounded-lg shadow-sm">
-                    <table class="w-full text-sm text-left text-gray-600">
-                        <thead class="text-xs text-gray-700 uppercase bg-gray-50">
-                           <tr>
-                                <th scope="col" class="px-6 py-3">Posição</th>
-                                <th scope="col" class="px-6 py-3">Nome da Jogadora</th>
-                                <th scope="col" class="px-6 py-3 text-center">Vitórias</th>
-                                <th scope="col" class="px-6 py-3 text-center">Derrotas</th>
-                                <th scope="col" class="px-6 py-3 text-center">Soma de Pontos</th>
-                            </tr>
-                        </thead>
-                        <tbody id="rainha-table-body"></tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Conteúdo Geral -->
-            <div id="geral-content" class="tab-content">
-                 <div class="table-container bg-white p-4 rounded-lg shadow-sm">
-                    <table class="w-full text-sm text-left text-gray-600">
-                        <thead class="text-xs text-gray-700 uppercase bg-gray-50">
-                            <tr>
-                                <th scope="col" class="px-6 py-3">Posição</th>
-                                <th scope="col" class="px-6 py-3">Nome do Jogador(a)</th>
-                                <th scope="col" class="px-6 py-3 text-center">Vitórias</th>
-                                <th scope="col" class="px-6 py-3 text-center">Derrotas</th>
-                                <th scope="col" class="px-6 py-3 text-center">Soma de Pontos</th>
-                            </tr>
-                        </thead>
-                        <tbody id="geral-table-body"></tbody>
-                    </table>
-                </div>
-            </div>
+            <!-- Outras Abas (Rei, Rainha, Geral) -->
+            <div id="rei-content" class="tab-content"><div class="table-container bg-white p-4 rounded-lg shadow-sm"><table class="w-full text-sm text-left text-gray-600"><thead class="text-xs text-gray-700 uppercase bg-gray-50"><tr><th scope="col" class="px-6 py-3">Posição</th><th scope="col" class="px-6 py-3">Nome do Jogador</th><th scope="col" class="px-6 py-3 text-center">Vitórias</th><th scope="col" class="px-6 py-3 text-center">Derrotas</th><th scope="col" class="px-6 py-3 text-center">Soma de Pontos</th></tr></thead><tbody id="rei-table-body"></tbody></table></div></div>
+            <div id="rainha-content" class="tab-content"><div class="table-container bg-white p-4 rounded-lg shadow-sm"><table class="w-full text-sm text-left text-gray-600"><thead class="text-xs text-gray-700 uppercase bg-gray-50"><tr><th scope="col" class="px-6 py-3">Posição</th><th scope="col" class="px-6 py-3">Nome da Jogadora</th><th scope="col" class="px-6 py-3 text-center">Vitórias</th><th scope="col" class="px-6 py-3 text-center">Derrotas</th><th scope="col" class="px-6 py-3 text-center">Soma de Pontos</th></tr></thead><tbody id="rainha-table-body"></tbody></table></div></div>
+            <div id="geral-content" class="tab-content"><div class="table-container bg-white p-4 rounded-lg shadow-sm"><table class="w-full text-sm text-left text-gray-600"><thead class="text-xs text-gray-700 uppercase bg-gray-50"><tr><th scope="col" class="px-6 py-3">Posição</th><th scope="col" class="px-6 py-3">Nome do Jogador(a)</th><th scope="col" class="px-6 py-3 text-center">Vitórias</th><th scope="col" class="px-6 py-3 text-center">Derrotas</th><th scope="col" class="px-6 py-3 text-center">Soma de Pontos</th></tr></thead><tbody id="geral-table-body"></tbody></table></div></div>
         </main>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
+        // **PASSO 1: Defina sua senha aqui**
+        // A senha é visível no código, então escolha uma que não use em outros lugares.
+        const EDIT_PASSWORD = 'sunset1406';
+
+        // Suas chaves do Firebase devem estar aqui
         const firebaseConfig = {
-                                  apiKey: "AIzaSyBeS64XUC0CIyQrX_NSRqx1-xhajWvaLzg",
-                                  authDomain: "sample-firebase-ai-app-3ceb5.firebaseapp.com",
-                                  projectId: "sample-firebase-ai-app-3ceb5",
-                                  storageBucket: "sample-firebase-ai-app-3ceb5.firebasestorage.app",
-                                  messagingSenderId: "903146387503",
-                                  appId: "1:903146387503:web:1ef57bf254c127961beeda"
-                                };
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'sunset-rei-rainha';
+          // Exemplo:
+          // apiKey: "AIza...",
+          // authDomain: "seu-projeto.firebaseapp.com",
+          // ...
+        };
         
+        const appId = 'volei-app-default';
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
@@ -174,24 +130,21 @@
         let userId = null;
         let scores = {};
         let scoresRef = null;
-        
-        // **NOVO: Determina o modo (edição ou visualização) pela URL**
-        const urlParams = new URLSearchParams(window.location.search);
-        const mode = urlParams.get('mode') === 'edit' ? 'edit' : 'view'; // Padrão para 'view'
+        let accessMode = 'view'; // Padrão é visualização
 
         function showModeIndicator() {
             const modeIndicator = document.getElementById('mode-indicator');
-            if (mode === 'edit') {
+            if (accessMode === 'edit') {
                 modeIndicator.innerHTML = `
                     <div class="p-2 bg-green-100 text-green-800 rounded-md text-sm text-center">
-                        <span class="font-bold">Modo Edição:</span> Você pode alterar os placares.
+                        <span class="font-bold">Modo Edição Ativado:</span> Você pode alterar os placares.
                     </div>
                 `;
                 document.getElementById('auth-info').style.display = 'block';
             } else {
                 modeIndicator.innerHTML = `
                     <div class="p-2 bg-sky-100 text-sky-800 rounded-md text-sm text-center">
-                        <span class="font-bold">Modo Visualização:</span> Para alterar, peça o link de edição ao organizador.
+                        <span class="font-bold">Modo Visualização:</span> Para alterar, use o link de edição.
                     </div>
                 `;
                 document.getElementById('auth-info').style.display = 'none';
@@ -202,20 +155,17 @@
             onAuthStateChanged(auth, async (user) => {
                 if (user) {
                     userId = user.uid;
+                    // O caminho correto para dados públicos compartilhados
                     scoresRef = doc(db, "artifacts", appId, "public", "data", "scores", "allScores");
                     
-                    if(mode === 'edit') {
-                        document.getElementById('auth-info').innerHTML = `<p>Conectado como: <span class="font-mono text-xs">${userId}</span></p>`;
+                    if(accessMode === 'edit') {
+                        document.getElementById('auth-info').innerHTML = `<p>Conectado como: Organizador <span class="font-mono text-xs"/span></p>`;
                     }
                     initializeData();
                 }
             });
             try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
+                await signInAnonymously(auth);
             } catch (error) {
                 console.error("Authentication failed:", error);
                 document.getElementById('auth-info').innerHTML = `<p class="text-red-500">Falha na autenticação.</p>`;
@@ -241,12 +191,11 @@
                 const row = document.createElement('tr');
                 row.className = 'bg-white border-b hover:bg-gray-50';
 
-                // **NOVO: Renderiza input ou texto baseado no modo**
-                const scoreInput1 = mode === 'edit' 
+                const scoreInput1 = accessMode === 'edit' 
                     ? `<input type="number" data-game-id="${game.id}" data-team="1" class="w-16 text-center bg-gray-100 rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" value="${score1 ?? ''}">`
                     : `<span class="font-semibold text-lg text-slate-700">${score1 ?? '-'}</span>`;
 
-                const scoreInput2 = mode === 'edit'
+                const scoreInput2 = accessMode === 'edit'
                     ? `<input type="number" data-game-id="${game.id}" data-team="2" class="w-16 text-center bg-gray-100 rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" value="${score2 ?? ''}">`
                     : `<span class="font-semibold text-lg text-slate-700">${score2 ?? '-'}</span>`;
 
@@ -268,8 +217,7 @@
                 tableBody.appendChild(row);
             });
 
-            // **NOVO: Adiciona listeners apenas no modo de edição**
-            if (mode === 'edit') {
+            if (accessMode === 'edit') {
                 document.querySelectorAll('#games-table-body input').forEach(input => {
                     input.addEventListener('input', handleScoreChange);
                 });
@@ -277,7 +225,7 @@
         }
         
         async function handleScoreChange(event) {
-            if (!userId || !scoresRef || mode !== 'edit') return;
+            if (!userId || !scoresRef || accessMode !== 'edit') return;
             const input = event.target;
             const gameId = input.dataset.gameId;
             const team = input.dataset.team;
@@ -288,49 +236,20 @@
 
         function updateAllRankings() {
             const playersStats = {};
-
             initialGames.forEach(game => {
                 const gameScores = scores[game.id];
                 if (gameScores && typeof gameScores.score1 === 'number' && typeof gameScores.score2 === 'number') {
-                    const s1 = gameScores.score1;
-                    const s2 = gameScores.score2;
-                    const team1Won = s1 > s2;
-                    const team2Won = s2 > s1;
-
-                    [game.p1h, game.p1m].forEach(p => {
-                        if (p && p !== 'A confirmar') {
-                            if (!playersStats[p]) playersStats[p] = { name: p, wins: 0, losses: 0, points: 0, gender: '' };
-                            playersStats[p].wins += team1Won ? 1 : 0;
-                            playersStats[p].losses += team2Won ? 1 : 0;
-                            playersStats[p].points += s1;
-                        }
-                    });
-
-                    [game.p2h, game.p2m].forEach(p => {
-                         if (p && p !== 'A confirmar') {
-                            if (!playersStats[p]) playersStats[p] = { name: p, wins: 0, losses: 0, points: 0, gender: '' };
-                            playersStats[p].wins += team2Won ? 1 : 0;
-                            playersStats[p].losses += team1Won ? 1 : 0;
-                            playersStats[p].points += s2;
-                        }
-                    });
+                    const s1 = gameScores.score1, s2 = gameScores.score2;
+                    const team1Won = s1 > s2, team2Won = s2 > s1;
+                    [game.p1h, game.p1m].forEach(p => { if (p && p !== 'A confirmar') { if (!playersStats[p]) playersStats[p] = { name: p, wins: 0, losses: 0, points: 0, gender: '' }; playersStats[p].wins += team1Won ? 1 : 0; playersStats[p].losses += team2Won ? 1 : 0; playersStats[p].points += s1; } });
+                    [game.p2h, game.p2m].forEach(p => { if (p && p !== 'A confirmar') { if (!playersStats[p]) playersStats[p] = { name: p, wins: 0, losses: 0, points: 0, gender: '' }; playersStats[p].wins += team2Won ? 1 : 0; playersStats[p].losses += team1Won ? 1 : 0; playersStats[p].points += s2; } });
                 }
             });
-            
             const malePlayers = new Set(initialGames.flatMap(g => [g.p1h, g.p2h]));
             const femalePlayers = new Set(initialGames.flatMap(g => [g.p1m, g.p2m]));
-
-            Object.values(playersStats).forEach(p => {
-                if (malePlayers.has(p.name)) p.gender = 'male';
-                if (femalePlayers.has(p.name)) p.gender = 'female';
-            });
-            
-            const allPlayersArray = Object.values(playersStats);
-            const malePlayersArray = allPlayersArray.filter(p => p.gender === 'male');
-            const femalePlayersArray = allPlayersArray.filter(p => p.gender === 'female');
-
+            Object.values(playersStats).forEach(p => { if (malePlayers.has(p.name)) p.gender = 'male'; if (femalePlayers.has(p.name)) p.gender = 'female'; });
+            const allPlayersArray = Object.values(playersStats), malePlayersArray = allPlayersArray.filter(p => p.gender === 'male'), femalePlayersArray = allPlayersArray.filter(p => p.gender === 'female');
             const sortFn = (a, b) => b.wins - a.wins || b.points - a.points;
-
             renderRankingTable('rei-table-body', malePlayersArray.sort(sortFn));
             renderRankingTable('rainha-table-body', femalePlayersArray.sort(sortFn));
             renderRankingTable('geral-table-body', allPlayersArray.sort(sortFn));
@@ -339,11 +258,7 @@
         function renderRankingTable(tableBodyId, players) {
             const tableBody = document.getElementById(tableBodyId);
             tableBody.innerHTML = '';
-            if (players.length === 0) {
-                tableBody.innerHTML = `<tr><td colspan="5" class="text-center py-8 text-gray-500">Aguardando resultados...</td></tr>`;
-                return;
-            }
-
+            if (players.length === 0) { tableBody.innerHTML = `<tr><td colspan="5" class="text-center py-8 text-gray-500">Aguardando resultados...</td></tr>`; return; }
             players.forEach((player, index) => {
                 const row = document.createElement('tr');
                 row.className = 'bg-white border-b hover:bg-gray-50';
@@ -352,29 +267,35 @@
                     <td class="px-6 py-4 font-medium text-gray-900">${player.name}</td>
                     <td class="px-6 py-4 text-center text-green-600 font-semibold">${player.wins}</td>
                     <td class="px-6 py-4 text-center text-red-600 font-semibold">${player.losses}</td>
-                    <td class="px-6 py-4 text-center font-semibold">${player.points}</td>
-                `;
+                    <td class="px-6 py-4 text-center font-semibold">${player.points}</td>`;
                 tableBody.appendChild(row);
             });
         }
 
         const tabs = document.getElementById('tabs');
-        const contents = document.querySelectorAll('.tab-content');
         tabs.addEventListener('click', (e) => {
             if (e.target.tagName === 'BUTTON') {
                 const targetTab = e.target.dataset.tab;
-                tabs.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
+                document.querySelectorAll('#tabs button').forEach(btn => btn.classList.remove('active'));
                 e.target.classList.add('active');
-                contents.forEach(content => {
+                document.querySelectorAll('.tab-content').forEach(content => {
                     content.classList.remove('active');
-                    if (content.id === `${targetTab}-content`) {
-                        content.classList.add('active');
-                    }
+                    if (content.id === `${targetTab}-content`) content.classList.add('active');
                 });
             }
         });
 
         window.onload = () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('mode') === 'edit') {
+                const enteredPassword = prompt("Digite a senha para entrar no modo de edição:");
+                if (enteredPassword === EDIT_PASSWORD) {
+                    accessMode = 'edit';
+                } else {
+                    alert("Senha incorreta. A página será carregada em modo de visualização.");
+                }
+            }
+            
             document.querySelector('.tab-btn[data-tab="games"]').click();
             showModeIndicator();
             setupAuth();
