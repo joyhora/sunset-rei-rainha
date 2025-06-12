@@ -32,7 +32,6 @@
 
     <div id="app" class="container mx-auto p-4 md:p-8">
         <header class="text-center mb-6 md:mb-8">
-            <!-- A imagem será carregada a partir do seu repositório -->
             <img src="logo.png" alt="Logo do Campeonato" class="mx-auto h-24 w-auto mb-4" onerror="this.style.display='none'">
             
             <h1 class="text-3xl md:text-4xl font-bold text-indigo-600">Placar do Campeonato de Vôlei</h1>
@@ -44,56 +43,75 @@
             <p>Carregando...</p>
         </div>
 
-        <div class="border-b border-gray-200 mb-6">
-            <nav class="flex flex-wrap -mb-px" id="tabs">
-                <button data-tab="games" class="tab-btn text-center p-4 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 transition duration-150 ease-in-out">Grade de Jogos</button>
-                <button data-tab="rei" class="tab-btn text-center p-4 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 transition duration-150 ease-in-out">Rei da Quadra</button>
-                <button data-tab="rainha" class="tab-btn text-center p-4 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 transition duration-150 ease-in-out">Rainha da Quadra</button>
-                <button data-tab="geral" class="tab-btn text-center p-4 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 transition duration-150 ease-in-out">Ranking Geral</button>
-            </nav>
+        <!-- Container para o botão de gerar tabela -->
+        <div id="schedule-generator-container" class="text-center my-6" style="display: none;">
+             <p class="text-amber-700 bg-amber-100 p-3 rounded-md mb-4">A tabela de jogos oficial ainda não foi criada.</p>
+             <button id="generate-schedule-btn" class="bg-indigo-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-indigo-700 transition duration-300">
+                Gerar Tabela Oficial de Jogos
+            </button>
         </div>
 
-        <main>
-            <!-- Conteúdo da Grade de Jogos -->
-            <div id="games-content" class="tab-content">
-                <div class="table-container bg-white p-4 rounded-lg shadow-sm">
-                    <table class="w-full text-sm text-left text-gray-600">
-                        <thead class="text-xs text-gray-700 uppercase bg-gray-50">
-                            <tr>
-                                <th scope="col" class="px-4 py-3 hidden md:table-cell">Rodada</th>
-                                <th scope="col" class="px-4 py-3 hidden md:table-cell">Horário</th>
-                                <th scope="col" class="px-4 py-3">Dupla 1</th>
-                                <th scope="col" class="px-2 py-3 text-center">Pontos</th>
-                                <th scope="col" class="px-2 py-3 text-center">X</th>
-                                <th scope="col" class="px-2 py-3 text-center">Pontos</th>
-                                <th scope="col" class="px-4 py-3">Dupla 2</th>
-                            </tr>
-                        </thead>
-                        <tbody id="games-table-body">
-                           <!-- Linhas dos jogos serão inseridas aqui -->
-                        </tbody>
-                    </table>
-                </div>
+        <!-- NOVO: Container para apagar a tabela (Reset) -->
+        <div id="schedule-reset-container" class="text-center my-6 p-4 border border-red-300 bg-red-50 rounded-lg max-w-lg mx-auto" style="display: none;">
+            <p class="text-red-800 font-semibold mb-2">Atenção: Ação Irreversível</p>
+            <p class="text-sm text-red-700 mb-3">Isso irá apagar permanentemente a tabela de jogos e todos os placares inseridos.</p>
+            <div class="flex items-center justify-center gap-2 sm:gap-4">
+                <input type="text" id="delete-confirm-input" placeholder='Digite "APAGAR"' class="border border-gray-300 rounded-md p-2 w-full max-w-xs">
+                <button id="reset-schedule-btn" class="bg-red-300 text-white font-bold py-2 px-4 rounded-lg cursor-not-allowed" disabled>
+                    Apagar Tudo
+                </button>
+            </div>
+        </div>
+
+        <div id="main-content" style="display: none;">
+            <div class="border-b border-gray-200 mb-6">
+                <nav class="flex flex-wrap -mb-px" id="tabs">
+                    <button data-tab="games" class="tab-btn text-center p-4 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 transition duration-150 ease-in-out">Grade de Jogos</button>
+                    <button data-tab="rei" class="tab-btn text-center p-4 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 transition duration-150 ease-in-out">Rei da Quadra</button>
+                    <button data-tab="rainha" class="tab-btn text-center p-4 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 transition duration-150 ease-in-out">Rainha da Quadra</button>
+                    <button data-tab="geral" class="tab-btn text-center p-4 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 transition duration-150 ease-in-out">Ranking Geral</button>
+                </nav>
             </div>
 
-            <!-- Outras Abas (Rei, Rainha, Geral) -->
-            <div id="rei-content" class="tab-content"><div class="table-container bg-white p-4 rounded-lg shadow-sm"><table class="w-full text-sm text-left text-gray-600"><thead class="text-xs text-gray-700 uppercase bg-gray-50"><tr><th scope="col" class="px-6 py-3">Posição</th><th scope="col" class="px-6 py-3">Nome do Jogador</th><th scope="col" class="px-6 py-3 text-center">Vitórias</th><th scope="col" class="px-6 py-3 text-center">Derrotas</th><th scope="col" class="px-6 py-3 text-center">Soma de Pontos</th></tr></thead><tbody id="rei-table-body"></tbody></table></div></div>
-            <div id="rainha-content" class="tab-content"><div class="table-container bg-white p-4 rounded-lg shadow-sm"><table class="w-full text-sm text-left text-gray-600"><thead class="text-xs text-gray-700 uppercase bg-gray-50"><tr><th scope="col" class="px-6 py-3">Posição</th><th scope="col" class="px-6 py-3">Nome da Jogadora</th><th scope="col" class="px-6 py-3 text-center">Vitórias</th><th scope="col" class="px-6 py-3 text-center">Derrotas</th><th scope="col" class="px-6 py-3 text-center">Soma de Pontos</th></tr></thead><tbody id="rainha-table-body"></tbody></table></div></div>
-            <div id="geral-content" class="tab-content"><div class="table-container bg-white p-4 rounded-lg shadow-sm"><table class="w-full text-sm text-left text-gray-600"><thead class="text-xs text-gray-700 uppercase bg-gray-50"><tr><th scope="col" class="px-6 py-3">Posição</th><th scope="col" class="px-6 py-3">Nome do Jogador(a)</th><th scope="col" class="px-6 py-3 text-center">Vitórias</th><th scope="col" class="px-6 py-3 text-center">Derrotas</th><th scope="col" class="px-6 py-3 text-center">Soma de Pontos</th></tr></thead><tbody id="geral-table-body"></tbody></table></div></div>
-        </main>
+            <main>
+                <!-- Conteúdo da Grade de Jogos -->
+                <div id="games-content" class="tab-content">
+                    <div class="table-container bg-white p-4 rounded-lg shadow-sm">
+                        <table class="w-full text-sm text-left text-gray-600">
+                            <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="px-4 py-3 hidden md:table-cell">Rodada</th>
+                                    <th scope="col" class="px-4 py-3 hidden md:table-cell">Horário</th>
+                                    <th scope="col" class="px-4 py-3">Dupla 1</th>
+                                    <th scope="col" class="px-2 py-3 text-center">Pontos</th>
+                                    <th scope="col" class="px-2 py-3 text-center">X</th>
+                                    <th scope="col" class="px-2 py-3 text-center">Pontos</th>
+                                    <th scope="col" class="px-4 py-3">Dupla 2</th>
+                                </tr>
+                            </thead>
+                            <tbody id="games-table-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- Outras Abas -->
+                <div id="rei-content" class="tab-content"><div class="table-container bg-white p-4 rounded-lg shadow-sm"><table class="w-full text-sm text-left text-gray-600"><thead class="text-xs text-gray-700 uppercase bg-gray-50"><tr><th scope="col" class="px-6 py-3">Posição</th><th scope="col" class="px-6 py-3">Nome do Jogador</th><th scope="col" class="px-6 py-3 text-center">Vitórias</th><th scope="col" class="px-6 py-3 text-center">Derrotas</th><th scope="col" class="px-6 py-3 text-center">Soma de Pontos</th></tr></thead><tbody id="rei-table-body"></tbody></table></div></div>
+                <div id="rainha-content" class="tab-content"><div class="table-container bg-white p-4 rounded-lg shadow-sm"><table class="w-full text-sm text-left text-gray-600"><thead class="text-xs text-gray-700 uppercase bg-gray-50"><tr><th scope="col" class="px-6 py-3">Posição</th><th scope="col" class="px-6 py-3">Nome da Jogadora</th><th scope="col" class="px-6 py-3 text-center">Vitórias</th><th scope="col" class="px-6 py-3 text-center">Derrotas</th><th scope="col" class="px-6 py-3 text-center">Soma de Pontos</th></tr></thead><tbody id="rainha-table-body"></tbody></table></div></div>
+                <div id="geral-content" class="tab-content"><div class="table-container bg-white p-4 rounded-lg shadow-sm"><table class="w-full text-sm text-left text-gray-600"><thead class="text-xs text-gray-700 uppercase bg-gray-50"><tr><th scope="col" class="px-6 py-3">Posição</th><th scope="col" class="px-6 py-3">Nome do Jogador(a)</th><th scope="col" class="px-6 py-3 text-center">Vitórias</th><th scope="col" class="px-6 py-3 text-center">Derrotas</th><th scope="col" class="px-6 py-3 text-center">Soma de Pontos</th></tr></thead><tbody id="geral-table-body"></tbody></table></div></div>
+            </main>
+        </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, onSnapshot, setDoc, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // *** CONFIGURAÇÕES DO TORNEIO ***
         const EDIT_PASSWORD = 'sunset1406';
         const malePlayers = ['Johnny', 'Eduardo', 'Alexandre', 'Renan', 'Kelvin', 'Pablo', 'João', 'Convidado 01', 'Convidado 02', 'Convidado 03'];
         const femalePlayers = ['Thais', 'Mayara', 'Jamile', 'Roberta', 'Isabela', 'Madalena', 'Ana Clara', 'Cris', 'Joyce', 'Convidada 01'];
         
-        // **PASSO FINAL: Cole aqui a configuração do seu projeto Firebase**
+        // Your web app's Firebase configuration
         const firebaseConfig = {
           apiKey: "AIzaSyBeS64XUC0CIyQrX_NSRqx1-xhajWvaLzg",
           authDomain: "sample-firebase-ai-app-3ceb5.firebaseapp.com",
@@ -103,7 +121,6 @@
           appId: "1:903146387503:web:1ef57bf254c127961beeda"
         };
         
-        // *** Verifica se a configuração do Firebase foi preenchida ***
         if (!firebaseConfig.apiKey || firebaseConfig.apiKey.includes("...")) {
             document.getElementById('app').innerHTML = `<div class="p-4 bg-red-100 text-red-800 rounded-lg text-center max-w-2xl mx-auto"><h2 class="font-bold text-xl mb-2">Erro de Configuração</h2><p>As chaves de acesso do Firebase não foram preenchidas no arquivo <strong>index.html</strong>.</p><p class="mt-2">Por favor, edite o código, cole a configuração do seu projeto Firebase na variável <strong>firebaseConfig</strong> e envie o arquivo para o GitHub novamente.</p></div>`;
             throw new Error("Configuração do Firebase ausente.");
@@ -114,9 +131,16 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // *** NOVO: Gerador de Tabela de Jogos Inteligente e Justo ***
+        let initialGames = [];
+        let userId = null;
+        let scores = {};
+        let scoresRef = null;
+        let scheduleRef = null;
+        let accessMode = 'view'; 
+
+        // *** Gerador de Tabela de Jogos Inteligente e Justo ***
         function generateFairSchedule(reis, rainhas) {
-            let allPossiblePairs = [];
+             let allPossiblePairs = [];
             for (const rei of reis) {
                 for (const rainha of rainhas) {
                     allPossiblePairs.push({ p_h: rei, p_m: rainha });
@@ -132,7 +156,6 @@
                 let playersInRound = new Set();
                 let pairsForThisRound = [...allPossiblePairs];
         
-                // Embaralha os pares disponíveis para variar os jogos
                 for (let i = pairsForThisRound.length - 1; i > 0; i--) {
                     const j = Math.floor(Math.random() * (i + 1));
                     [pairsForThisRound[i], pairsForThisRound[j]] = [pairsForThisRound[j], pairsForThisRound[i]];
@@ -140,11 +163,8 @@
         
                 let gamesMade = 0;
                 while (gamesMade < 4 && pairsForThisRound.length >= 2) {
-                    let pair1 = null;
-                    let pair2 = null;
-                    let pair1_index = -1;
+                    let pair1 = null, pair2 = null, pair1_index = -1;
                     
-                    // Encontra o primeiro par válido
                     for (let i = 0; i < pairsForThisRound.length; i++) {
                         const p1_players = [pairsForThisRound[i].p_h, pairsForThisRound[i].p_m];
                         if (!p1_players.some(p => playersInRound.has(p))) {
@@ -155,10 +175,7 @@
                     }
         
                     if (pair1) {
-                        // Encontra o segundo par válido (que não conflita com o primeiro)
                         for (let j = 0; j < pairsForThisRound.length; j++) {
-                            // *** CORREÇÃO APLICADA AQUI ***
-                            // Usava a variável 'i' que estava fora de escopo. Agora usa 'pair1_index'.
                             if (pair1_index === j) continue; 
                             
                             const p2_players = [pairsForThisRound[j].p_h, pairsForThisRound[j].p_m];
@@ -172,11 +189,9 @@
                     }
         
                     if (pair1 && pair2) {
-                        // Adiciona o jogo e remove os pares da lista de disponíveis
                         roundGames.push({ p1: pair1, p2: pair2 });
                         [pair1.p_h, pair1.p_m, pair2.p_h, pair2.p_m].forEach(p => playersInRound.add(p));
         
-                        // Remove os pares da lista geral para não serem usados de novo
                         allPossiblePairs = allPossiblePairs.filter(p => 
                             !(p.p_h === pair1.p_h && p.p_m === pair1.p_m) && 
                             !(p.p_h === pair2.p_h && p.p_m === pair2.p_m)
@@ -185,12 +200,10 @@
                         pairsForThisRound = [...allPossiblePairs];
                         gamesMade++;
                     } else {
-                        // Se não encontrar uma combinação, para de tentar adicionar jogos nesta rodada
                         break; 
                     }
                 }
         
-                // Formata os jogos da rodada e adiciona à lista final
                 roundGames.forEach(game => {
                     const baseTime = 8 * 60 + 30;
                     const gameTimeInMinutes = baseTime + (roundNum - 1) * 20;
@@ -209,13 +222,6 @@
             return scheduledGames;
         }
 
-        const initialGames = generateFairSchedule(malePlayers, femalePlayers);
-        
-        let userId = null;
-        let scores = {};
-        let scoresRef = null;
-        let accessMode = 'view'; 
-
         function showModeIndicator() {
             const modeIndicator = document.getElementById('mode-indicator');
             if (accessMode === 'edit') {
@@ -231,12 +237,13 @@
             onAuthStateChanged(auth, async (user) => {
                 if (user) {
                     userId = user.uid;
+                    scheduleRef = doc(db, "artifacts", appId, "public", "data", "schedule", "main");
                     scoresRef = doc(db, "artifacts", appId, "public", "data", "scores", "allScores");
                     
                     if(accessMode === 'edit') {
                         document.getElementById('auth-info').innerHTML = `<p>Conectado como: <span class="font-mono text-xs">${userId}</span></p>`;
                     }
-                    initializeData();
+                    loadSchedule();
                 }
             });
             try {
@@ -247,7 +254,83 @@
             }
         }
         
-        async function initializeData() {
+        async function loadSchedule() {
+            if (!scheduleRef) return;
+            const scheduleSnap = await getDoc(scheduleRef);
+
+            if (scheduleSnap.exists()) {
+                initialGames = JSON.parse(scheduleSnap.data().gamesJSON);
+                document.getElementById('main-content').style.display = 'block';
+                document.getElementById('schedule-generator-container').style.display = 'none';
+                
+                // Mostra o botão de reset para o admin
+                if (accessMode === 'edit') {
+                    document.getElementById('schedule-reset-container').style.display = 'block';
+                    document.getElementById('delete-confirm-input').addEventListener('input', handleResetConfirmation);
+                    document.getElementById('reset-schedule-btn').addEventListener('click', resetAndClearData);
+                }
+                
+                initializeScoreListener();
+            } else {
+                // Tabela não existe, mostra o botão para o admin
+                if (accessMode === 'edit') {
+                    document.getElementById('schedule-generator-container').style.display = 'block';
+                    document.getElementById('generate-schedule-btn').addEventListener('click', generateAndSaveSchedule);
+                } else {
+                    document.getElementById('schedule-generator-container').style.display = 'block';
+                    document.getElementById('schedule-generator-container').innerHTML = `<p class="text-amber-700 bg-amber-100 p-3 rounded-md mb-4">A tabela de jogos ainda não foi gerada pelo organizador.</p>`;
+                }
+            }
+        }
+
+        async function generateAndSaveSchedule() {
+            const btn = document.getElementById('generate-schedule-btn');
+            btn.disabled = true;
+            btn.textContent = "Gerando...";
+            const newSchedule = generateFairSchedule(malePlayers, femalePlayers);
+            await setDoc(scheduleRef, { gamesJSON: JSON.stringify(newSchedule) });
+            // Recarrega a página para garantir que todos vejam a mesma tabela
+            window.location.reload();
+        }
+
+        function handleResetConfirmation(event) {
+            const input = event.target;
+            const resetButton = document.getElementById('reset-schedule-btn');
+            if (input.value === 'APAGAR') {
+                resetButton.disabled = false;
+                resetButton.classList.remove('bg-red-300', 'cursor-not-allowed');
+                resetButton.classList.add('bg-red-600', 'hover:bg-red-700');
+            } else {
+                resetButton.disabled = true;
+                resetButton.classList.add('bg-red-300', 'cursor-not-allowed');
+                resetButton.classList.remove('bg-red-600', 'hover:bg-red-700');
+            }
+        }
+
+        async function resetAndClearData() {
+            try {
+                const btn = document.getElementById('reset-schedule-btn');
+                btn.disabled = true;
+                btn.textContent = "Apagando...";
+                
+                await deleteDoc(scheduleRef);
+                await deleteDoc(scoresRef);
+                
+                const container = document.getElementById('schedule-reset-container');
+                container.innerHTML = '<p class="text-green-700 bg-green-100 p-3 rounded-md">Dados apagados! A página será recarregada.</p>';
+
+                setTimeout(() => {
+                    window.location.reload();
+                }, 2000); 
+
+            } catch (error) {
+                console.error("Erro ao apagar os dados: ", error);
+                const container = document.getElementById('schedule-reset-container');
+                container.innerHTML = '<p class="text-red-700 bg-red-100 p-3 rounded-md">Ocorreu um erro ao apagar os dados. Verifique o console e tente novamente.</p>';
+            }
+        }
+
+        async function initializeScoreListener() {
             if (!scoresRef) return;
             onSnapshot(scoresRef, (docSnap) => {
                 scores = docSnap.exists() ? docSnap.data() : {};
