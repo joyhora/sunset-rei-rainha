@@ -91,15 +91,17 @@
         // A senha é visível no código, então escolha uma que não use em outros lugares.
         const EDIT_PASSWORD = 'sunset1406';
 
-        // Suas chaves do Firebase devem estar aqui
+ // Your web app's Firebase configuration
         const firebaseConfig = {
-          // Exemplo:
-          // apiKey: "AIza...",
-          // authDomain: "seu-projeto.firebaseapp.com",
-          // ...
+          apiKey: "AIzaSyBeS64XUC0CIyQrX_NSRqx1-xhajWvaLzg",
+          authDomain: "sample-firebase-ai-app-3ceb5.firebaseapp.com",
+          projectId: "sample-firebase-ai-app-3ceb5",
+          storageBucket: "sample-firebase-ai-app-3ceb5.firebasestorage.app",
+          messagingSenderId: "903146387503",
+          appId: "1:903146387503:web:1ef57bf254c127961beeda"
         };
         
-        const appId = 'volei-app-default';
+        const appId = 'sunset-rei-rainha';
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
