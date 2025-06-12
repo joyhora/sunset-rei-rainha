@@ -88,11 +88,12 @@
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // **PASSO 1: Defina sua senha aqui**
-        // A senha é visível no código, então escolha uma que não use em outros lugares.
+        // *** CONFIGURAÇÕES DO TORNEIO ***
         const EDIT_PASSWORD = 'sunset1406';
-
- // Your web app's Firebase configuration
+        const malePlayers = ['Johnny', 'Eduardo', 'Alexandre', 'Renan', 'Kelvin', 'Pablo', 'João', 'Convidado 01', 'Convidado 02', 'Convidado 03'];
+        const femalePlayers = ['Thais', 'Mayara', 'Jamile', 'Roberta', 'Isabela', 'Madalena', 'Ana Clara', 'Cris', 'Joyce', 'Convidada 01'];
+        
+        // **PASSO FINAL: Cole aqui a configuração do seu projeto Firebase**
         const firebaseConfig = {
           apiKey: "AIzaSyBeS64XUC0CIyQrX_NSRqx1-xhajWvaLzg",
           authDomain: "sample-firebase-ai-app-3ceb5.firebaseapp.com",
@@ -102,65 +103,114 @@
           appId: "1:903146387503:web:1ef57bf254c127961beeda"
         };
         
+        // *** Verifica se a configuração do Firebase foi preenchida ***
+        if (!firebaseConfig.apiKey || firebaseConfig.apiKey.includes("...")) {
+            document.getElementById('app').innerHTML = `<div class="p-4 bg-red-100 text-red-800 rounded-lg text-center max-w-2xl mx-auto"><h2 class="font-bold text-xl mb-2">Erro de Configuração</h2><p>As chaves de acesso do Firebase não foram preenchidas no arquivo <strong>index.html</strong>.</p><p class="mt-2">Por favor, edite o código, cole a configuração do seu projeto Firebase na variável <strong>firebaseConfig</strong> e envie o arquivo para o GitHub novamente.</p></div>`;
+            throw new Error("Configuração do Firebase ausente.");
+        }
+
         const appId = 'sunset-rei-rainha';
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
+        // *** NOVO: Gerador de Tabela de Jogos Inteligente e Justo ***
+        function generateFairSchedule(reis, rainhas) {
+            let allPossiblePairs = [];
+            for (const rei of reis) {
+                for (const rainha of rainhas) {
+                    allPossiblePairs.push({ p_h: rei, p_m: rainha });
+                }
+            }
         
-        const initialGames = [
-            { id: 1, round: 1, horario: '08:30', p1h: 'Johnny', p1m: 'Mayara', p2h: 'João', p2m: 'Thais' },
-            { id: 2, round: 1, horario: '08:30', p1h: 'A confirmar 01', p1m: 'Cris', p2h: 'Pablo', p2m: 'Isabela' },
-            { id: 3, round: 1, horario: '08:30', p1h: 'Eduardo', p1m: 'A confirmar', p2h: 'Pablo', p2m: 'Joyce' },
-            { id: 4, round: 1, horario: '08:30', p1h: 'Renan', p1m: 'Madalena', p2h: 'Pablo', p2m: 'Cris' },
-            { id: 5, round: 2, horario: '08:50', p1h: 'Eduardo', p1m: 'Jamille', p2h: 'Johnny', p2m: 'A confirmar' },
-            { id: 6, round: 2, horario: '08:50', p1h: 'Johnny', p1m: 'Roberta', p2h: 'Eduardo', p2m: 'Isabela' },
-            { id: 7, round: 2, horario: '08:50', p1h: 'Pablo', p1m: 'Thais', p2h: 'Johnny', p2m: 'Madalena' },
-            { id: 8, round: 2, horario: '08:50', p1h: 'Kelvin', p1m: 'Isabela', p2h: 'A confirmar 03', p2m: 'Mayara' },
-            { id: 9, round: 3, horario: '09:10', p1h: 'João', p1m: 'Cris', p2h: 'Renan', p2m: 'Joyce' },
-            { id: 10, round: 3, horario: '09:10', p1h: 'Johnny', p1m: 'Madalena', p2h: 'A confirmar 02', p2m: 'Thais' },
-            { id: 11, round: 3, horario: '09:10', p1h: 'Alexandre', p1m: 'Cris', p2h: 'Kelvin', p2m: 'Joyce' },
-            { id: 12, round: 3, horario: '09:10', p1h: 'Pablo', p1m: 'Ana Clara', p2h: 'João', p2m: 'Jamille' },
-            { id: 13, round: 4, horario: '09:30', p1h: 'Renan', p1m: 'Mayara', p2h: 'Johnny', p2m: 'Roberta' },
-            { id: 14, round: 4, horario: '09:30', p1h: 'Eduardo', p1m: 'Joyce', p2h: 'A confirmar 01', p2m: 'Ana Clara' },
-            { id: 15, round: 4, horario: '09:30', p1h: 'Alexandre', p1m: 'Madalena', p2h: 'Renan', p2m: 'Jamille' },
-            { id: 16, round: 4, horario: '09:30', p1h: 'Pablo', p1m: 'Cris', p2h: 'Kelvin', p2m: 'A confirmar' },
-            { id: 17, round: 5, horario: '09:50', p1h: 'João', p1m: 'Isabela', p2h: 'Eduardo', p2m: 'Cris' },
-            { id: 18, round: 5, horario: '09:50', p1h: 'Johnny', p1m: 'Joyce', p2h: 'Renan', p2m: 'Ana Clara' },
-            { id: 19, round: 5, horario: '09:50', p1h: 'Pablo', p1m: 'Jamille', p2h: 'João', p2m: 'Roberta' },
-            { id: 20, round: 5, horario: '09:50', p1h: 'A confirmar 02', p1m: 'Isabela', p2h: 'A confirmar 03', p2m: 'Thais' },
-            { id: 21, round: 6, horario: '10:10', p1h: 'Kelvin', p1m: 'Ana Clara', p2h: 'A confirmar 01', p2m: 'Cris' },
-            { id: 22, round: 6, horario: '10:10', p1h: 'Alexandre', p1m: 'Roberta', p2h: 'Renan', p2m: 'Jamille' },
-            { id: 23, round: 6, horario: '10:10', p1h: 'Pablo', p1m: 'Isabela', p2h: 'João', p2m: 'Mayara' },
-            { id: 24, round: 6, horario: '10:10', p1h: 'Johnny', p1m: 'Ana Clara', p2h: 'Eduardo', p2m: 'Thais' },
-            { id: 25, round: 7, horario: '10:30', p1h: 'Kelvin', p1m: 'Thais', p2h: 'A confirmar 01', p2m: 'Mayara' },
-            { id: 26, round: 7, horario: '10:30', p1h: 'Johnny', p1m: 'Jamille', p2h: 'Eduardo', p2m: 'Cris' },
-            { id: 27, round: 7, horario: '10:30', p1h: 'Pablo', p1m: 'Roberta', p2h: 'João', p2m: 'Joyce' },
-            { id: 28, round: 7, horario: '10:30', p1h: 'Alexandre', p1m: 'Thais', p2h: 'Renan', p2m: 'Isabela' },
-            { id: 29, round: 8, horario: '10:50', p1h: 'Kelvin', p1m: 'Joyce', p2h: 'Renan', p2m: 'Roberta' },
-            { id: 30, round: 8, horario: '10:50', p1h: 'A confirmar 02', p1m: 'Ana Clara', p2h: 'A confirmar 03', p2m: 'Cris' },
-            { id: 31, round: 8, horario: '10:50', p1h: 'Johnny', p1m: 'Cris', p2h: 'Pablo', p2m: 'Jamille' },
-            { id: 32, round: 8, horario: '10:50', p1h: 'Eduardo', p1m: 'Madalena', p2h: 'João', p2m: 'Isabela' },
-            { id: 33, round: 9, horario: '11:10', p1h: 'Kelvin', p1m: 'Roberta', p2h: 'A confirmar 01', p2m: 'Joyce' },
-            { id: 34, round: 9, horario: '11:10', p1h: 'Alexandre', p1m: 'Cris', p2h: 'Eduardo', p2m: 'Joyce' },
-            { id: 35, round: 9, horario: '11:10', p1h: 'Pablo', p1m: 'Mayara', p2h: 'Renan', p2m: 'Thais' },
-            { id: 36, round: 9, horario: '11:10', p1h: 'Johnny', p1m: 'A confirmar', p2h: 'João', p2m: 'Cris' },
-            { id: 37, round: 10, horario: '11:30', p1h: 'Renan', p1m: 'Thais', p2h: 'A confirmar 02', p2m: 'Jamille' },
-            { id: 38, round: 10, horario: '11:30', p1h: 'Alexandre', p1m: 'Ana Clara', p2h: 'Eduardo', p2m: 'Madalena' },
-            { id: 39, round: 10, horario: '11:30', p1h: 'Pablo', p1m: 'Roberta', p2h: 'João', p2m: 'Thais' },
-            { id: 40, round: 10, horario: '11:30', p1h: 'Kelvin', p1m: 'Mayara', p2h: 'A confirmar 01', p2m: 'Isabela' },
-            { id: 41, round: 11, horario: '11:50', p1h: 'Johnny', p1m: 'Thais', p2h: 'Renan', p2m: 'Joyce' },
-            { id: 42, round: 11, horario: '11:50', p1h: 'Alexandre', p1m: 'Madalena', p2h: 'João', p2m: 'Cris' },
-            { id: 43, round: 11, horario: '11:50', p1h: 'Pablo', p1m: 'A confirmar', p2h: 'A confirmar 03', p2m: 'Isabela' },
-            { id: 44, round: 11, horario: '11:50', p1h: 'Eduardo', p1m: 'Roberta', p2h: 'A confirmar 02', p2m: 'Cris' },
-            { id: 45, round: 12, horario: '12:10', p1h: 'Kelvin', p1m: 'Madalena', p2h: 'A confirmar 01', p2m: 'Joyce' },
-            { id: 46, round: 12, horario: '12:10', p1h: 'Pablo', p1m: 'Thais', p2h: 'Renan', p2m: 'Isabela' },
-            { id: 47, round: 12, horario: '12:10', p1h: 'Johnny', p1m: 'Cris', p2h: 'Eduardo', p2m: 'Joyce' },
-            { id: 48, round: 12, horario: '12:10', p1h: 'Alexandre', p1m: 'Roberta', p2h: 'João', p2m: 'Ana Clara' },
-            { id: 49, round: 13, horario: '12:30', p1h: 'Kelvin', p1m: 'Thais', p2h: 'A confirmar 02', p2m: 'Isabela' },
-            { id: 50, round: 13, horario: '12:30', p1h: 'Renan', p1m: 'Ana Clara', p2h: 'A confirmar 03', p2m: 'Mayara' }
-        ];
+            let scheduledGames = [];
+            let gameId = 1;
+            let rounds = 13; 
+        
+            for (let roundNum = 1; roundNum <= rounds; roundNum++) {
+                let roundGames = [];
+                let playersInRound = new Set();
+                let pairsForThisRound = [...allPossiblePairs];
+        
+                // Embaralha os pares disponíveis para variar os jogos
+                for (let i = pairsForThisRound.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [pairsForThisRound[i], pairsForThisRound[j]] = [pairsForThisRound[j], pairsForThisRound[i]];
+                }
+        
+                let gamesMade = 0;
+                while (gamesMade < 4 && pairsForThisRound.length >= 2) {
+                    let pair1 = null;
+                    let pair2 = null;
+                    let pair1_index = -1;
+                    
+                    // Encontra o primeiro par válido
+                    for (let i = 0; i < pairsForThisRound.length; i++) {
+                        const p1_players = [pairsForThisRound[i].p_h, pairsForThisRound[i].p_m];
+                        if (!p1_players.some(p => playersInRound.has(p))) {
+                            pair1 = pairsForThisRound[i];
+                            pair1_index = i;
+                            break;
+                        }
+                    }
+        
+                    if (pair1) {
+                        // Encontra o segundo par válido (que não conflita com o primeiro)
+                        for (let j = 0; j < pairsForThisRound.length; j++) {
+                            // *** CORREÇÃO APLICADA AQUI ***
+                            // Usava a variável 'i' que estava fora de escopo. Agora usa 'pair1_index'.
+                            if (pair1_index === j) continue; 
+                            
+                            const p2_players = [pairsForThisRound[j].p_h, pairsForThisRound[j].p_m];
+                            const combinedPlayers = new Set([...[pair1.p_h, pair1.p_m], ...p2_players]);
 
+                            if (combinedPlayers.size === 4 && !p2_players.some(p => playersInRound.has(p))) {
+                                pair2 = pairsForThisRound[j];
+                                break;
+                            }
+                        }
+                    }
+        
+                    if (pair1 && pair2) {
+                        // Adiciona o jogo e remove os pares da lista de disponíveis
+                        roundGames.push({ p1: pair1, p2: pair2 });
+                        [pair1.p_h, pair1.p_m, pair2.p_h, pair2.p_m].forEach(p => playersInRound.add(p));
+        
+                        // Remove os pares da lista geral para não serem usados de novo
+                        allPossiblePairs = allPossiblePairs.filter(p => 
+                            !(p.p_h === pair1.p_h && p.p_m === pair1.p_m) && 
+                            !(p.p_h === pair2.p_h && p.p_m === pair2.p_m)
+                        );
+                        
+                        pairsForThisRound = [...allPossiblePairs];
+                        gamesMade++;
+                    } else {
+                        // Se não encontrar uma combinação, para de tentar adicionar jogos nesta rodada
+                        break; 
+                    }
+                }
+        
+                // Formata os jogos da rodada e adiciona à lista final
+                roundGames.forEach(game => {
+                    const baseTime = 8 * 60 + 30;
+                    const gameTimeInMinutes = baseTime + (roundNum - 1) * 20;
+                    const hours = Math.floor(gameTimeInMinutes / 60).toString().padStart(2, '0');
+                    const minutes = (gameTimeInMinutes % 60).toString().padStart(2, '0');
+        
+                    scheduledGames.push({
+                        id: gameId++,
+                        round: roundNum,
+                        horario: `${hours}:${minutes}`,
+                        p1h: game.p1.p_h, p1m: game.p1.p_m,
+                        p2h: game.p2.p_h, p2m: game.p2.p_m
+                    });
+                });
+            }
+            return scheduledGames;
+        }
+
+        const initialGames = generateFairSchedule(malePlayers, femalePlayers);
+        
         let userId = null;
         let scores = {};
         let scoresRef = null;
@@ -169,18 +219,10 @@
         function showModeIndicator() {
             const modeIndicator = document.getElementById('mode-indicator');
             if (accessMode === 'edit') {
-                modeIndicator.innerHTML = `
-                    <div class="p-2 bg-green-100 text-green-800 rounded-md text-sm text-center">
-                        <span class="font-bold">Modo Edição Ativado:</span> Você pode alterar os placares.
-                    </div>
-                `;
+                modeIndicator.innerHTML = `<div class="p-2 bg-green-100 text-green-800 rounded-md text-sm text-center"><span class="font-bold">Modo Edição Ativado:</span> Você pode alterar os placares.</div>`;
                 document.getElementById('auth-info').style.display = 'block';
             } else {
-                modeIndicator.innerHTML = `
-                    <div class="p-2 bg-sky-100 text-sky-800 rounded-md text-sm text-center">
-                        <span class="font-bold">Modo Visualização:</span> Para alterar, use o link de edição.
-                    </div>
-                `;
+                modeIndicator.innerHTML = `<div class="p-2 bg-sky-100 text-sky-800 rounded-md text-sm text-center"><span class="font-bold">Modo Visualização:</span> Para alterar, use o link de edição.</div>`;
                 document.getElementById('auth-info').style.display = 'none';
             }
         }
@@ -192,7 +234,7 @@
                     scoresRef = doc(db, "artifacts", appId, "public", "data", "scores", "allScores");
                     
                     if(accessMode === 'edit') {
-                        document.getElementById('auth-info').innerHTML = `<p>Conectado como: Organizador <span class="font-mono text-xs"</span></p>`;
+                        document.getElementById('auth-info').innerHTML = `<p>Conectado como: <span class="font-mono text-xs">${userId}</span></p>`;
                     }
                     initializeData();
                 }
@@ -246,7 +288,6 @@
             });
             if (accessMode === 'edit') {
                 document.querySelectorAll('#games-table-body input').forEach(input => {
-                    // *** CORREÇÃO APLICADA AQUI ***
                     input.addEventListener('change', handleScoreChange);
                 });
             }
@@ -263,18 +304,20 @@
 
         function updateAllRankings() {
             const playersStats = {};
+            const allMalePlayers = new Set(malePlayers);
+            const allFemalePlayers = new Set(femalePlayers);
+            
             initialGames.forEach(game => {
                 const gameScores = scores[game.id];
                 if (gameScores && typeof gameScores.score1 === 'number' && typeof gameScores.score2 === 'number') {
                     const s1 = gameScores.score1, s2 = gameScores.score2;
                     const team1Won = s1 > s2, team2Won = s2 > s1;
-                    [game.p1h, game.p1m].forEach(p => { if (p && p.indexOf('A confirmar') === -1) { if (!playersStats[p]) playersStats[p] = { name: p, wins: 0, losses: 0, points: 0, gender: '' }; playersStats[p].wins += team1Won ? 1 : 0; playersStats[p].losses += team2Won ? 1 : 0; playersStats[p].points += s1; } });
-                    [game.p2h, game.p2m].forEach(p => { if (p && p.indexOf('A confirmar') === -1) { if (!playersStats[p]) playersStats[p] = { name: p, wins: 0, losses: 0, points: 0, gender: '' }; playersStats[p].wins += team2Won ? 1 : 0; playersStats[p].losses += team1Won ? 1 : 0; playersStats[p].points += s2; } });
+                    [game.p1h, game.p1m].forEach(p => { if (p && !p.includes('Convidado')) { if (!playersStats[p]) playersStats[p] = { name: p, wins: 0, losses: 0, points: 0, gender: '' }; playersStats[p].wins += team1Won ? 1 : 0; playersStats[p].losses += team2Won ? 1 : 0; playersStats[p].points += s1; } });
+                    [game.p2h, game.p2m].forEach(p => { if (p && !p.includes('Convidado')) { if (!playersStats[p]) playersStats[p] = { name: p, wins: 0, losses: 0, points: 0, gender: '' }; playersStats[p].wins += team2Won ? 1 : 0; playersStats[p].losses += team1Won ? 1 : 0; playersStats[p].points += s2; } });
                 }
             });
-            const malePlayers = new Set(initialGames.flatMap(g => [g.p1h, g.p2h]).filter(p => p.indexOf('A confirmar') === -1));
-            const femalePlayers = new Set(initialGames.flatMap(g => [g.p1m, g.p2m]).filter(p => p.indexOf('A confirmar') === -1));
-            Object.values(playersStats).forEach(p => { if (malePlayers.has(p.name)) p.gender = 'male'; if (femalePlayers.has(p.name)) p.gender = 'female'; });
+
+            Object.values(playersStats).forEach(p => { if (allMalePlayers.has(p.name)) p.gender = 'male'; if (allFemalePlayers.has(p.name)) p.gender = 'female'; });
             const allPlayersArray = Object.values(playersStats), malePlayersArray = allPlayersArray.filter(p => p.gender === 'male'), femalePlayersArray = allPlayersArray.filter(p => p.gender === 'female');
             const sortFn = (a, b) => b.wins - a.wins || b.points - a.points;
             renderRankingTable('rei-table-body', malePlayersArray.sort(sortFn));
